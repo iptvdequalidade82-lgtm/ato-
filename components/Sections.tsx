@@ -93,53 +93,18 @@ export function About() {
 /* ───────────────────────── Impacto ───────────────────────── */
 export function Impact() {
   return (
-    <section aria-labelledby="impacto-titulo" className="grain relative overflow-hidden bg-navy text-paper">
-      {/* o Λ da marca, em duas linhas finas que atravessam a seção */}
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-0 h-full w-full"
-      >
-        <path
-          data-draw
-          pathLength={1}
-          d="M620 900 L1080 0"
-          fill="none"
-          stroke="var(--color-gold)"
-          strokeOpacity="0.55"
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          data-draw
-          pathLength={1}
-          d="M1080 0 L1440 700"
-          fill="none"
-          stroke="var(--color-paper)"
-          strokeOpacity="0.22"
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-
-      <div className="wrap relative grid grid-cols-12 gap-x-6 py-[clamp(7rem,18vw,16rem)]">
-        <h2 id="impacto-titulo" data-lines className="display-xl col-span-12 lg:col-span-9">
+    <section
+      aria-labelledby="impacto-titulo"
+      className="grain relative isolate overflow-hidden bg-navy text-paper"
+    >
+      <div className="wrap relative z-10 py-[clamp(7rem,15vw,13rem)]">
+        <h2
+          id="impacto-titulo"
+          data-lines
+          className="display-xl max-w-[15ch] text-left"
+        >
           <Lines lines={impact.titleLines} />
         </h2>
-        <div
-          data-reveal
-          className="col-span-7 col-start-6 mt-14 aspect-[3/2] overflow-hidden sm:col-span-5 sm:col-start-8 lg:col-span-3 lg:col-start-10 lg:-mt-24"
-        >
-          <Picture
-            name="impacto"
-            alt="Vértice de uma estrutura de concreto apontando para cima, iluminado contra o escuro"
-            ratio={[3, 2]}
-            sizes="(min-width: 1024px) 24vw, 56vw"
-            className="h-[112%] w-full object-cover"
-            data-parallax=""
-          />
-        </div>
       </div>
     </section>
   );
