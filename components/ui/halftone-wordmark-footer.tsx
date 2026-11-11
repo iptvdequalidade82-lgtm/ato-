@@ -235,20 +235,25 @@ export default function HalftoneWordmarkFooter({
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
 
-      // Set the word once, at a size that fills the width, on a 1x mask.
+      // A marca pontilhada ocupa somente a metade inferior do rodapé.
+      // Limita tamanho por largura E altura para nunca cobrir menus/contatos.
       const mask = document.createElement("canvas")
       mask.width = w
       mask.height = h
       const m = mask.getContext("2d", { willReadFrequently: true })
       if (!m) return
-      const face = o.fontWeight + " 100px " + o.fontFamily
-      m.font = face
       const word = o.wordmark || " "
-      const fit = hwfFitSize(m.measureText(word).width, w * 1.02)
+      m.font = o.fontWeight + " 100px " + o.fontFamily
+      const reference = m.measureText(word)
+      const c = Math.max(0, Math.min(0.6, o.crop))
+      const capRatio = (reference.actualBoundingBoxAscent || 72) / 100
+      const byWidth = hwfFitSize(reference.width, w * 0.78)
+      const protectedTop = Math.min(h - 80, Math.max(225, h * 0.48))
+      const byHeight = Math.max(1, (h - protectedTop) / Math.max(0.2, capRatio * (1 - c)))
+      const fit = Math.max(1, Math.min(byWidth, byHeight))
       m.font = o.fontWeight + " " + fit + "px " + o.fontFamily
       const box = m.measureText(word)
       const cap = box.actualBoundingBoxAscent || fit * 0.72
-      const c = Math.max(0, Math.min(0.6, o.crop))
       m.fillStyle = "#000"
       m.textBaseline = "alphabetic"
       m.fillText(word, (w - box.width) / 2, h + cap * c)
