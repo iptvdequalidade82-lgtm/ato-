@@ -1,7 +1,7 @@
 import { about, cta, hero, impact, site, team, tunnel } from "@/content/site";
 import PerspectiveTunnelHero from "./ui/perspective-tunnel-hero";
-import { Button, Lines, Picture, ext } from "./ui";
-import HalftoneWordmarkFooter from "./ui/halftone-wordmark-footer";
+import { Button, Lines, Picture, Wordmark, ext } from "./ui";
+
 import ImpactVideoGallery from "./ImpactVideoGallery";
 
 /* ───────────────────────── Hero (túnel em perspectiva) ───────────────────────── */
@@ -206,46 +206,55 @@ export function Cta() {
   );
 }
 
-/* ───────────────────────── Footer ───────────────────────── */
+/* ───────────────────────── Footer (marca ATO lisa) ───────────────────────── */
 export function Footer() {
   return (
-    <HalftoneWordmarkFooter
-      wordmark="ATO"
-      label={site.name}
-      meta={`© ${site.year} ATO. Todos os direitos reservados.`}
-      columns={[
-        {
-          title: "Explorar",
-          links: [
-            { label: "A ATO", href: "#sobre" },
-            { label: "Soluções", href: "#solucoes" },
-            { label: "Nossa equipe", href: "#equipe" },
-          ],
-        },
-        {
-          title: "Conectar",
-          links: [
-            { label: "WhatsApp", href: site.whatsapp },
-            { label: "Instagram", href: site.instagram },
-            { label: "Contato", href: "#contato" },
-          ],
-        },
-      ]}
-      palette={{
-        background: "#080d1b",
-        ink: "#f6f5f2",
-        warm: "#bda477",
-      }}
-      fontFamily='"Manrope Variable", "Manrope", Arial, sans-serif'
-      fontWeight={500}
-      monoFamily='"Manrope Variable", "Manrope", Arial, sans-serif'
-      dotGap={7}
-      radius={76}
-      crop={0.23}
-      grain={0.16}
-      interactive
-      backToTop
-      height="clamp(420px, 42vw, 550px)"
-    />
+    <footer className="relative overflow-hidden border-t border-line-inv bg-navy text-paper">
+      <div className="wrap pt-[clamp(2rem,4vw,3rem)]">
+        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_minmax(0,1fr)]">
+          <div>
+            <p className="text-[0.875rem] font-semibold tracking-[0.03em]">{site.name}</p>
+            <p className="mt-2 text-[0.75rem] leading-relaxed text-mist">
+              © {site.year} ATO. Todos os direitos reservados.
+            </p>
+          </div>
+
+          <nav aria-label="Explorar" className="text-[0.8125rem]">
+            <p className="mb-3 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-mist">Explorar</p>
+            <ul className="space-y-1">
+              <li><a href="#sobre" className="link">A ATO</a></li>
+              <li><a href="#solucoes" className="link">Soluções</a></li>
+              <li><a href="#equipe" className="link">Nossa equipe</a></li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Conectar" className="text-[0.8125rem]">
+            <p className="mb-3 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-mist">Conectar</p>
+            <ul className="space-y-1">
+              <li><a href={site.whatsapp} {...ext(site.whatsapp)} className="link">WhatsApp</a></li>
+              <li><a href={site.instagram} {...ext(site.instagram)} className="link">Instagram</a></li>
+              <li><a href="#contato" className="link">Contato</a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <div className="mt-9 flex justify-end border-t border-line-inv pt-4">
+          <a href="#topo" className="link text-[0.6875rem] font-semibold uppercase tracking-[0.16em]">
+            Voltar ao topo ↑
+          </a>
+        </div>
+      </div>
+
+      {/* Reutiliza exatamente a marca do cabeçalho. O corte é feito pelo contêiner,
+          sem Canvas, pontilhado ou efeitos sobre as letras. */}
+      <div
+        className="relative mt-6 h-[clamp(6.5rem,22vw,22rem)] w-full overflow-hidden text-paper"
+        aria-label="ATO"
+      >
+        <div className="absolute left-1/2 top-0 -translate-x-1/2">
+          <Wordmark className="whitespace-nowrap text-[clamp(9rem,34vw,34rem)]" />
+        </div>
+      </div>
+    </footer>
   );
 }
