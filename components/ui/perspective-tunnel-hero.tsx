@@ -16,17 +16,13 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n));
 export default function PerspectiveTunnelHero({
   images,
   titleLines,
-  text,
   actions,
   id,
-  scrollHint = "Role para explorar",
 }: {
   images: TunnelImage[];
   titleLines: readonly string[];
-  text: string;
   actions?: ReactNode;
   id?: string;
-  scrollHint?: string;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -39,7 +35,6 @@ export default function PerspectiveTunnelHero({
     if (!section || !scene || !title) return;
 
     const cards = Array.from(scene.querySelectorAll<HTMLElement>("[data-tunnel-card]"));
-    const hint = scene.querySelector<HTMLElement>("[data-tunnel-hint]");
     const debug = scene.querySelector<HTMLElement>("[data-tunnel-debug]");
     let frame = 0;
     let mouseX = 0;
@@ -70,7 +65,6 @@ export default function PerspectiveTunnelHero({
       title.style.transform = "scale(" + titleScale.toFixed(4) + ")";
       title.style.opacity = titleOpacity.toFixed(3);
 
-      if (hint) hint.style.opacity = clamp(1 - progress * 18).toFixed(3);
 
       cards.forEach((card, index) => {
         const golden = index * 137.5 * (Math.PI / 180);
@@ -137,7 +131,7 @@ export default function PerspectiveTunnelHero({
       id={id}
       ref={sectionRef}
       aria-labelledby="hero-titulo"
-      data-ato-hero-version="scroll-v5-auto"
+      data-ato-hero-version="scroll-v6-minimal"
       className="grain relative h-[350svh] bg-navy text-paper"
     >
       <div
@@ -145,15 +139,6 @@ export default function PerspectiveTunnelHero({
         className="sticky top-0 flex h-[100svh] w-full items-center justify-center overflow-hidden"
         style={{ perspective: "1200px" }}
       >
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 1440 900"
-          preserveAspectRatio="none"
-          className="pointer-events-none absolute inset-0 h-full w-full"
-        >
-          <path d="M260 900 L720 40 L1180 900" fill="none" stroke="var(--color-gold)" strokeOpacity="0.22" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-        </svg>
-
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -193,28 +178,21 @@ export default function PerspectiveTunnelHero({
             aria-hidden="true"
             className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[120%] w-[min(110%,60rem)] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(closest-side,rgba(8,13,27,0.72),rgba(8,13,27,0))]"
           />
-          <h1 id="hero-titulo" className="display-xl max-w-[12ch] [text-shadow:0_2px_30px_rgba(8,13,27,0.85)]">
+          <h1
+            id="hero-titulo"
+            className="w-full max-w-[85rem] text-[clamp(2.1rem,8.4vw,4rem)] font-light leading-[1.04] tracking-[-0.055em] text-paper sm:text-[clamp(4rem,6.1vw,7.4rem)] [text-shadow:0_2px_32px_rgba(8,13,27,0.65)]"
+          >
             {titleLines.map((line, index) => (
-              <span key={index} className="line"><span>{line}</span></span>
+              <span key={index} className="line">
+                <span className="block sm:whitespace-nowrap">{line}</span>
+              </span>
             ))}
           </h1>
-          <p className="lead mt-7 max-w-[34ch] text-mist [text-shadow:0_2px_20px_rgba(8,13,27,0.9)]">
-            {text}
-          </p>
           {actions && (
-            <div className="mt-10 flex flex-col items-center gap-x-9 gap-y-5 sm:flex-row">
+            <div className="mt-10 flex flex-col items-center justify-center gap-x-9 gap-y-5 sm:mt-12 sm:flex-row">
               {actions}
             </div>
           )}
-        </div>
-
-        <div
-          data-tunnel-hint=""
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-7 z-[60] flex flex-col items-center gap-3 text-[0.875rem] text-mist"
-        >
-          <span>{scrollHint}</span>
-          <span className="block h-8 w-px bg-gold" />
         </div>
 
         <output
