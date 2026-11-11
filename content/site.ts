@@ -21,8 +21,7 @@ export const nav = [
 ];
 
 export const hero = {
-  titleLines: ["Seu futuro", "merece um plano", "à altura."],
-  text: "Planejamento e orientação para as suas próximas conquistas.",
+  titleLines: ["Seu futuro merece", "um plano à altura."],
   primary: { label: "Conheça a ATO", href: "#sobre" },
   secondary: { label: "Fale com nossa equipe", href: site.whatsapp },
 };
