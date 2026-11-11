@@ -2,6 +2,7 @@ import { about, cta, hero, impact, site, team, tunnel } from "@/content/site";
 import PerspectiveTunnelHero from "./ui/perspective-tunnel-hero";
 import { Button, Lines, Picture, ext } from "./ui";
 import HalftoneWordmarkFooter from "./ui/halftone-wordmark-footer";
+import ImpactVideoGallery from "./ImpactVideoGallery";
 
 /* ───────────────────────── Hero (túnel em perspectiva) ───────────────────────── */
 export function Hero() {
@@ -97,7 +98,7 @@ export function Impact() {
       aria-labelledby="impacto-titulo"
       className="grain relative isolate overflow-hidden bg-navy text-paper"
     >
-      <div className="wrap relative z-10 py-[clamp(7rem,15vw,13rem)]">
+      <div className="wrap relative z-10 py-[clamp(6rem,12vw,10rem)]">
         <h2
           id="impacto-titulo"
           data-lines
@@ -105,6 +106,7 @@ export function Impact() {
         >
           <Lines lines={impact.titleLines} />
         </h2>
+        <ImpactVideoGallery />
       </div>
     </section>
   );
