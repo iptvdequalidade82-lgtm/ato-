@@ -47,7 +47,6 @@ export default function PerspectiveTunnelHero({
     let frame = 0;
     let mouseX = 0;
     let mouseY = 0;
-    let lastProgress = -1;
 
     section.dataset.atoHeroRuntime = "ready";
     if (debug && new URLSearchParams(window.location.search).get("heroDebug") === "1") {
@@ -64,7 +63,6 @@ export default function PerspectiveTunnelHero({
       const distance = Math.max(1, rect.height - height);
       const scrollProgress = clamp(-rect.top / distance);
       const progress = allowMotion ? scrollProgress : 0.37;
-      lastProgress = progress;
       section.dataset.atoHeroProgress = Math.round(scrollProgress * 100).toString();
 
       if (debug) {
@@ -188,7 +186,7 @@ export default function PerspectiveTunnelHero({
                   srcSet={item.srcSet}
                   sizes="(max-width: 767px) 40vw, 21vw"
                   alt=""
-                  loading={index < 3 ? "eager" : "lazy"}
+                  loading="eager"
                   decoding="async"
                   draggable={false}
                   className="h-full w-full object-cover"
