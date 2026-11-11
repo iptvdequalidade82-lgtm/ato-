@@ -237,7 +237,7 @@ export function Footer() {
         warm: "#bda477",
       }}
       fontFamily='"Manrope Variable", "Manrope", Arial, sans-serif'
-      fontWeight={300}
+      fontWeight={500}
       monoFamily='"Manrope Variable", "Manrope", Arial, sans-serif'
       dotGap={7}
       radius={76}
