@@ -1,6 +1,7 @@
-import { about, cta, hero, impact, nav, site, team, tunnel } from "@/content/site";
+import { about, cta, hero, impact, site, team, tunnel } from "@/content/site";
 import PerspectiveTunnelHero from "./ui/perspective-tunnel-hero";
-import { Arrow, Button, Lines, Picture, Wordmark, ext } from "./ui";
+import { Button, Lines, Picture, ext } from "./ui";
+import HalftoneWordmarkFooter from "./ui/halftone-wordmark-footer";
 
 /* ───────────────────────── Hero (túnel em perspectiva) ───────────────────────── */
 export function Hero() {
@@ -241,49 +242,43 @@ export function Cta() {
 /* ───────────────────────── Footer ───────────────────────── */
 export function Footer() {
   return (
-    <footer className="grain border-t border-line-inv bg-ink text-paper">
-      <div className="wrap pb-10 pt-16 lg:pt-24">
-        <div className="grid grid-cols-12 gap-x-6 gap-y-12">
-          <div className="col-span-12 lg:col-span-5">
-            <p className="text-xl font-medium tracking-[-0.02em]">{site.name}</p>
-            <p className="mt-3 max-w-[36ch] text-mist">
-              Investir no futuro é transformar intenção em realidade.
-            </p>
-          </div>
-          <nav aria-label="Rodapé" className="col-span-6 lg:col-span-3 lg:col-start-7">
-            <ul className="space-y-1">
-              {nav.map((n) => (
-                <li key={n.href}>
-                  <a href={n.href} className="link">
-                    {n.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <ul className="col-span-6 space-y-1 lg:col-span-3">
-            <li>
-              <a href={site.instagram} {...ext(site.instagram)} className="link inline-flex items-center gap-3">
-                Instagram <Arrow />
-              </a>
-            </li>
-            <li>
-              <a href={site.whatsapp} {...ext(site.whatsapp)} className="link inline-flex items-center gap-3">
-                WhatsApp <Arrow />
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <Wordmark weight={300} className="mt-16 block text-[clamp(6rem,27vw,26rem)] text-paper/90 lg:mt-24" />
-
-        <div className="mt-10 flex flex-col gap-2 border-t border-line-inv pt-6 text-[0.875rem] text-mist sm:flex-row sm:justify-between">
-          <p>
-            © {site.year} {site.name}. Todos os direitos reservados.
-          </p>
-          <p>Projeto conceito por Brandify</p>
-        </div>
-      </div>
-    </footer>
+    <HalftoneWordmarkFooter
+      wordmark="ATO"
+      label={site.name}
+      meta={`© ${site.year} ATO. Todos os direitos reservados.`}
+      columns={[
+        {
+          title: "Explorar",
+          links: [
+            { label: "A ATO", href: "#sobre" },
+            { label: "Soluções", href: "#solucoes" },
+            { label: "Nossa equipe", href: "#equipe" },
+          ],
+        },
+        {
+          title: "Conectar",
+          links: [
+            { label: "WhatsApp", href: site.whatsapp },
+            { label: "Instagram", href: site.instagram },
+            { label: "Contato", href: "#contato" },
+          ],
+        },
+      ]}
+      palette={{
+        background: "#080d1b",
+        ink: "#f6f5f2",
+        warm: "#bda477",
+      }}
+      fontFamily='"Manrope Variable", "Manrope", Arial, sans-serif'
+      fontWeight={800}
+      monoFamily='"Manrope Variable", "Manrope", Arial, sans-serif'
+      dotGap={7}
+      radius={76}
+      crop={0.23}
+      grain={0.16}
+      interactive
+      backToTop
+      height="clamp(420px, 42vw, 550px)"
+    />
   );
 }
