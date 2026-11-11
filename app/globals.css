@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+/* ───────── Tokens (cores aproximadas a partir do Instagram, não oficiais) ───────── */
+@theme {
+  --color-navy: #080d1b;
+  --color-navy-2: #101831;
+  --color-ink: #0b0c0f;
+  --color-paper: #f6f5f2;
+  --color-gold: #bda477;
+  --color-gold-deep: #76623a;
+  --color-mute: #565a63;
+  --color-mist: #aab0c0;
+  --color-line: rgb(11 12 15 / 0.14);
+  --color-line-inv: rgb(246 245 242 / 0.16);
+
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --header-h: 4.5rem;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-h);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: var(--color-gold);
+  color: var(--color-navy);
+}
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+}
+.on-light :focus-visible {
+  outline-color: var(--color-navy);
+}
+html {
+  scrollbar-color: #2a3350 var(--color-navy);
+}
+
+@layer components {
+/* ───────── Layout ───────── */
+.wrap {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section {
+  padding-block: clamp(5.5rem, 12vw, 12rem);
+}
+
+/* ───────── Tipografia ───────── */
+.display-xl,
+.display-lg,
+.display-md {
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.display-xl {
+  font-size: clamp(2.5rem, 12vw, 5rem);
+  line-height: 0.98;
+}
+@media (min-width: 640px) {
+  .display-xl {
+    font-size: clamp(4rem, 8.2vw, 8.25rem);
+  }
+}
+.display-lg {
+  font-size: clamp(2.25rem, 5.4vw, 5.25rem);
+  line-height: 1.02;
+}
+.display-md {
+  font-size: clamp(1.75rem, 3.2vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.lead {
+  font-size: clamp(1.125rem, 1.45vw, 1.375rem);
+  line-height: 1.5;
+}
+/* máscara de linha para o reveal dos títulos */
+.line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.line > span {
+  display: block;
+  will-change: transform;
+}
+
+/* ───────── Links e botões ───────── */
+.link {
+  position: relative;
+  display: inline-block;
+  padding-block: 0.35rem;
+}
+.link::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.6s var(--ease-expo);
+}
+.link:hover::after,
+.link:focus-visible::after,
+.link[data-underlined]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.link[data-underlined]:hover::after {
+  transform: scaleX(0);
+  transform-origin: right;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 3.5rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0 1.5rem 0 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  transition:
+    background-color 0.5s var(--ease-expo),
+    color 0.5s var(--ease-expo);
+}
+.btn svg {
+  transition: transform 0.6s var(--ease-expo);
+}
+.btn:hover svg,
+.btn:focus-visible svg {
+  transform: translateX(6px);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-light {
+  background: var(--color-paper);
+  color: var(--color-navy);
+}
+.btn-light:hover {
+  background: var(--color-gold);
+}
+.btn-dark {
+  background: var(--color-navy);
+  color: var(--color-paper);
+}
+.btn-dark:hover {
+  background: var(--color-navy-2);
+}
+
+}
+
+/* ───────── Textura discretíssima nas áreas escuras ───────── */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ───────── Estados iniciais das animações (só com JS e sem reduced-motion) ───────── */
+.motion [data-reveal] {
+  opacity: 0;
+  visibility: hidden;
+}
+.motion [data-lines] .line > span {
+  transform: translateY(112%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
