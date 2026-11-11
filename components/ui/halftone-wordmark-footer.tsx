@@ -235,28 +235,68 @@ export default function HalftoneWordmarkFooter({
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
 
-      // A marca pontilhada ocupa somente a metade inferior do rodapé.
-      // Limita tamanho por largura E altura para nunca cobrir menus/contatos.
+      // A mesma construção da marca no cabeçalho: A geométrico sem travessão
+      // e TO na Manrope leve. A máscara continua pontilhada e cortada embaixo.
       const mask = document.createElement("canvas")
       mask.width = w
       mask.height = h
       const m = mask.getContext("2d", { willReadFrequently: true })
       if (!m) return
-      const word = o.wordmark || " "
-      m.font = o.fontWeight + " 100px " + o.fontFamily
-      const reference = m.measureText(word)
       const c = Math.max(0, Math.min(0.6, o.crop))
-      const capRatio = (reference.actualBoundingBoxAscent || 72) / 100
-      const byWidth = hwfFitSize(reference.width, w * 0.78)
       const protectedTop = Math.min(h - 80, Math.max(225, h * 0.48))
-      const byHeight = Math.max(1, (h - protectedTop) / Math.max(0.2, capRatio * (1 - c)))
-      const fit = Math.max(1, Math.min(byWidth, byHeight))
-      m.font = o.fontWeight + " " + fit + "px " + o.fontFamily
-      const box = m.measureText(word)
-      const cap = box.actualBoundingBoxAscent || fit * 0.72
-      m.fillStyle = "#000"
-      m.textBaseline = "alphabetic"
-      m.fillText(word, (w - box.width) / 2, h + cap * c)
+      const brand = o.wordmark.trim().toUpperCase() === "ATO"
+
+      if (brand) {
+        // Usar a fonte carregada pelo próprio site e a silhueta original do A.
+        const baseSize = 100
+        m.font = o.fontWeight + " " + baseSize + "px " + o.fontFamily
+        const tRef = m.measureText("T")
+        const oRef = m.measureText("O")
+        const capRatio = Math.max(0.55, (oRef.actualBoundingBoxAscent || 71) / baseSize)
+        const aRatio = capRatio * (66 / 72)
+        const spaceA = 0.11
+        const spaceTO = 0.115
+        const totalRatio = aRatio + spaceA + tRef.width / baseSize + spaceTO + oRef.width / baseSize
+        const byWidth = (w * 0.76) / totalRatio
+        const byHeight = (h - protectedTop) / Math.max(0.2, capRatio * (1 - c))
+        const size = Math.max(1, Math.min(byWidth, byHeight))
+        const cap = capRatio * size
+        const aWidth = aRatio * size
+        const totalWidth = totalRatio * size
+        const baseline = h + cap * c
+        let x = (w - totalWidth) / 2
+        m.lineJoin = "miter"
+        m.lineCap = "butt"
+        m.strokeStyle = "#000"
+        m.lineWidth = Math.max(1, cap * 0.083)
+        m.beginPath()
+        m.moveTo(x + m.lineWidth * 0.3, baseline + cap * 0.06)
+        m.lineTo(x + aWidth / 2, baseline - cap)
+        m.lineTo(x + aWidth - m.lineWidth * 0.3, baseline + cap * 0.06)
+        m.stroke()
+        x += aWidth + spaceA * size
+        m.font = o.fontWeight + " " + size + "px " + o.fontFamily
+        m.fillStyle = "#000"
+        m.textBaseline = "alphabetic"
+        m.fillText("T", x, baseline)
+        x += m.measureText("T").width + spaceTO * size
+        m.fillText("O", x, baseline)
+      } else {
+        // Compatibilidade com outras palavras, sem alterar a API do componente.
+        const word = o.wordmark || " "
+        m.font = o.fontWeight + " 100px " + o.fontFamily
+        const reference = m.measureText(word)
+        const capRatio = (reference.actualBoundingBoxAscent || 72) / 100
+        const byWidth = hwfFitSize(reference.width, w * 0.76)
+        const byHeight = Math.max(1, (h - protectedTop) / Math.max(0.2, capRatio * (1 - c)))
+        const size = Math.max(1, Math.min(byWidth, byHeight))
+        m.font = o.fontWeight + " " + size + "px " + o.fontFamily
+        const box = m.measureText(word)
+        const cap = box.actualBoundingBoxAscent || size * 0.72
+        m.fillStyle = "#000"
+        m.textBaseline = "alphabetic"
+        m.fillText(word, (w - box.width) / 2, h + cap * c)
+      }
       const img = m.getImageData(0, 0, w, h).data
 
       const gap = Math.max(3, o.dotGap)
