@@ -11,7 +11,6 @@ export function Hero() {
       id="topo"
       images={tunnel}
       titleLines={hero.titleLines}
-      text={hero.text}
       actions={
         <>
           <Button href={hero.primary.href}>{hero.primary.label}</Button>
