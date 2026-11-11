@@ -4,8 +4,8 @@
  * Perspective Tunnel Hero — adaptado para a ATO.
  *
  * Base: componente "perspective-tunnel-hero" (21st.dev), com estas mudanças:
- * - roda do mouse, trackpad, toque e teclado avançam o túnel enquanto a primeira tela está no
- *   topo; quando o túnel termina, a página volta a rolar normalmente (e ao subir, ele volta);
+ * - a rolagem nativa move o túnel enquanto a primeira tela fica fixa;
+ * - quando a animação termina, a página continua para a próxima seção;
  * - começa só com o título; as fotos surgem conforme a rolagem e o título cresce e some no fim;
  * - prefers-reduced-motion: cena estática, sem túnel nem parallax;
  * - visual da ATO (azul-marinho, Manrope, sem gradientes de texto nem cores neon).
@@ -14,6 +14,7 @@
 import {
   motion,
   useMotionValue,
+  useScroll,
   useReducedMotion,
   useSpring,
   useTransform,
@@ -84,12 +85,13 @@ function TunnelCard({
   total: number;
   stage: Stage;
 }) {
-  const span = 0.55;
-  const start = (card.index / total) * (1 - span);
+  const span = 0.52;
+  const start = total > 1 ? (card.index / (total - 1)) * 0.43 : 0;
   const local = useTransform(progress, [start, start + span], [0, 1]);
 
-  const z = useTransform(local, [0, 1], stage.isMobile ? [-1200, 350] : [-1700, 500]);
-  const opacity = useTransform(local, [0, 0.18, 0.82, 0.98], [0, 1, 1, 0]);
+  const z = useTransform(local, [0, 1], stage.isMobile ? [-1100, 670] : [-1600, 800]);
+  const opacity = useTransform(local, [0, 0.14, 0.75, 0.93, 1], [0, 1, 1, 1, 0]);
+  const zIndex = useTransform(z, (depth) => (depth > -120 ? 70 + card.index : card.index + 1));
 
   const width = stage.isMobile
     ? Math.max(120, Math.min(170, stage.width * 0.36))
@@ -106,7 +108,7 @@ function TunnelCard({
 
   return (
     <motion.figure
-      style={{ width, transform, opacity, zIndex: card.index + 1 }}
+      style={{ width, transform, opacity, zIndex }}
       className="pointer-events-none absolute left-1/2 top-1/2 m-0 aspect-[4/5] will-change-transform"
     >
       <div className="relative h-full w-full overflow-hidden rounded-[3px] bg-navy-2 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.75)] ring-1 ring-white/10">
@@ -155,66 +157,14 @@ export default function PerspectiveTunnelHero({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Avanço do túnel controlado pela roda/trackpad/toque/teclado, como no componente original.
-  // Só "segura" a rolagem enquanto a primeira tela está no topo e o túnel não terminou.
-  const raw = useMotionValue(0);
-  const smooth = useSpring(raw, { stiffness: 80, damping: 30, restDelta: 0.0001 });
-
-  useEffect(() => {
-    if (reduce) return;
-    const el = sectionRef.current;
-    if (!el) return;
-    const atTop = () => el.getBoundingClientRect().top >= -2;
-    const advance = (delta: number) => {
-      const p = raw.get();
-      if (!atTop()) return false;
-      if ((delta > 0 && p >= 1) || (delta < 0 && p <= 0)) return false;
-      raw.set(Math.min(1, Math.max(0, p + delta)));
-      return true;
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      const px = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
-      if (advance(px * 0.0005)) e.preventDefault();
-    };
-
-    let lastY: number | null = null;
-    const onTouchStart = (e: TouchEvent) => (lastY = e.touches[0]?.clientY ?? null);
-    const onTouchMove = (e: TouchEvent) => {
-      const y = e.touches[0]?.clientY;
-      if (lastY == null || y == null) return;
-      const dy = lastY - y;
-      lastY = y;
-      if (advance(dy * 0.0009)) e.preventDefault();
-    };
-    const onTouchEnd = () => (lastY = null);
-
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(t.tagName))) return;
-      const step =
-        e.key === "ArrowDown" || e.key === "PageDown" || (e.key === " " && !e.shiftKey)
-          ? 0.12
-          : e.key === "ArrowUp" || e.key === "PageUp" || (e.key === " " && e.shiftKey)
-            ? -0.12
-            : 0;
-      if (step && advance(step)) e.preventDefault();
-    };
-
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [raw, reduce]);
-  const still = useMotionValue(0.4);
+  // O progresso segue a rolagem real enquanto a primeira tela permanece fixa.
+  // Sem capturar eventos: mouse, trackpad, toque, teclado e links continuam nativos.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+  const smooth = useSpring(scrollYProgress, { stiffness: 75, damping: 26, mass: 0.4, restDelta: 0.0001 });
+  const still = useMotionValue(0.35);
   const progress = reduce ? still : smooth;
 
   const pointer = useCameraParallax(!reduce && !stage.isMobile);
@@ -230,10 +180,10 @@ export default function PerspectiveTunnelHero({
       id={id}
       ref={sectionRef}
       aria-labelledby="hero-titulo"
-      className="grain relative h-[100svh] bg-navy text-paper"
+      className="grain relative h-[360svh] bg-navy text-paper motion-reduce:h-[100svh]"
     >
       <div
-        className="relative flex h-full w-full items-center justify-center overflow-hidden"
+        className="sticky top-0 flex h-[100svh] w-full items-center justify-center overflow-hidden"
         style={{ perspective: stage.isMobile ? "900px" : "1200px" }}
       >
         {/* o Λ da marca, em duas linhas finas ao fundo */}
