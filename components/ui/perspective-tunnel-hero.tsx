@@ -14,7 +14,6 @@
 import {
   motion,
   useMotionValue,
-  useScroll,
   useReducedMotion,
   useSpring,
   useTransform,
@@ -157,15 +156,46 @@ export default function PerspectiveTunnelHero({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // O progresso segue a rolagem real enquanto a primeira tela permanece fixa.
-  // Sem capturar eventos: mouse, trackpad, toque, teclado e links continuam nativos.
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
-  const smooth = useSpring(scrollYProgress, { stiffness: 75, damping: 26, mass: 0.4, restDelta: 0.0001 });
+  // Mede diretamente a posição do palco no documento. O scroll permanece 100% nativo:
+  // a cena sticky avança proporcionalmente ao percurso antes de liberar a próxima seção.
+  const raw = useMotionValue(0);
+  const smooth = useSpring(raw, { stiffness: 100, damping: 30, mass: 0.35, restDelta: 0.0001 });
   const still = useMotionValue(0.35);
   const progress = reduce ? still : smooth;
+
+  useEffect(() => {
+    if (reduce) return;
+    const section = sectionRef.current;
+    if (!section) return;
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const rect = section.getBoundingClientRect();
+      const viewport = window.innerHeight || 1;
+      const distance = Math.max(1, rect.height - viewport);
+      const nextProgress = Math.max(0, Math.min(1, -rect.top / distance));
+      raw.set(nextProgress);
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("pageshow", schedule);
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    resizeObserver?.observe(section);
+
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("pageshow", schedule);
+      resizeObserver?.disconnect();
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [raw, reduce]);
 
   const pointer = useCameraParallax(!reduce && !stage.isMobile);
 
@@ -178,6 +208,7 @@ export default function PerspectiveTunnelHero({
   return (
     <section
       id={id}
+      data-ato-hero-version="scroll-v3"
       ref={sectionRef}
       aria-labelledby="hero-titulo"
       className="grain relative h-[360svh] bg-navy text-paper motion-reduce:h-[100svh]"
