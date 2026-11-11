@@ -41,9 +41,6 @@ export default function PerspectiveTunnelHero({
     const cards = Array.from(scene.querySelectorAll<HTMLElement>("[data-tunnel-card]"));
     const hint = scene.querySelector<HTMLElement>("[data-tunnel-hint]");
     const debug = scene.querySelector<HTMLElement>("[data-tunnel-debug]");
-    const enable = scene.querySelector<HTMLButtonElement>("[data-tunnel-enable]");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let allowMotion = !reduced;
     let frame = 0;
     let mouseX = 0;
     let mouseY = 0;
@@ -52,7 +49,6 @@ export default function PerspectiveTunnelHero({
     if (debug && new URLSearchParams(window.location.search).get("heroDebug") === "1") {
       debug.style.display = "block";
     }
-    if (reduced && enable) enable.style.display = "block";
 
     const render = () => {
       frame = 0;
@@ -62,12 +58,11 @@ export default function PerspectiveTunnelHero({
       const rect = section.getBoundingClientRect();
       const distance = Math.max(1, rect.height - height);
       const scrollProgress = clamp(-rect.top / distance);
-      const progress = allowMotion ? scrollProgress : 0.37;
+      const progress = scrollProgress;
       section.dataset.atoHeroProgress = Math.round(scrollProgress * 100).toString();
 
       if (debug) {
-        debug.textContent = "Túnel 3D " + (allowMotion ? "ativo" : "reduzido") +
-          " · " + Math.round(scrollProgress * 100) + "% · " + cards.length + " fotos";
+        debug.textContent = "Túnel 3D ativo · " + Math.round(scrollProgress * 100) + "% · " + cards.length + " fotos";
       }
 
       const titleScale = 0.89 + 0.32 * progress;
@@ -92,8 +87,8 @@ export default function PerspectiveTunnelHero({
 
         const x = angleX * width * (isMobile ? 0.30 : (0.25 + (index % 3) * 0.065));
         const y = angleY * height * (isMobile ? 0.23 : (0.24 + (index % 2) * 0.07));
-        const px = allowMotion && !isMobile ? mouseX * 18 : 0;
-        const py = allowMotion && !isMobile ? mouseY * 18 : 0;
+        const px = !isMobile ? mouseX * 18 : 0;
+        const py = !isMobile ? mouseY * 18 : 0;
         const rotation = (index % 2 === 0 ? 1 : -1) * (2 + (index % 5) * 1.5);
         const cardWidth = isMobile
           ? Math.max(118, Math.min(180, width * 0.38))
@@ -118,18 +113,10 @@ export default function PerspectiveTunnelHero({
       mouseY = (event.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
       schedule();
     };
-    const enableMotion = () => {
-      allowMotion = true;
-      section.style.height = "350svh";
-      if (enable) enable.style.display = "none";
-      schedule();
-    };
-
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule, { passive: true });
     window.addEventListener("pageshow", schedule);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    enable?.addEventListener("click", enableMotion);
     const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(schedule) : null;
     observer?.observe(section);
     render();
@@ -139,7 +126,6 @@ export default function PerspectiveTunnelHero({
       window.removeEventListener("resize", schedule);
       window.removeEventListener("pageshow", schedule);
       window.removeEventListener("pointermove", onPointerMove);
-      enable?.removeEventListener("click", enableMotion);
       observer?.disconnect();
       if (frame) window.cancelAnimationFrame(frame);
       section.dataset.atoHeroRuntime = "unmounted";
@@ -151,8 +137,8 @@ export default function PerspectiveTunnelHero({
       id={id}
       ref={sectionRef}
       aria-labelledby="hero-titulo"
-      data-ato-hero-version="scroll-v4-dom"
-      className="grain relative h-[350svh] bg-navy text-paper motion-reduce:h-[100svh]"
+      data-ato-hero-version="scroll-v5-auto"
+      className="grain relative h-[350svh] bg-navy text-paper"
     >
       <div
         ref={sceneRef}
@@ -231,14 +217,6 @@ export default function PerspectiveTunnelHero({
           <span className="block h-8 w-px bg-gold" />
         </div>
 
-        <button
-          data-tunnel-enable=""
-          type="button"
-          style={{ display: "none" }}
-          className="absolute bottom-8 right-5 z-[90] border border-paper/35 bg-navy px-4 py-2 text-xs text-paper"
-        >
-          Ativar efeito 3D
-        </button>
         <output
           data-tunnel-debug=""
           style={{ display: "none" }}
