@@ -236,7 +236,7 @@ export default function HalftoneWordmarkFooter({
       canvas.height = Math.round(h * dpr)
 
       // A mesma construção da marca no cabeçalho: A geométrico sem travessão
-      // e TO na Manrope leve. A máscara continua pontilhada e cortada embaixo.
+      // e TO na Manrope da marca. A máscara continua pontilhada e cortada embaixo.
       const mask = document.createElement("canvas")
       mask.width = w
       mask.height = h
@@ -253,9 +253,9 @@ export default function HalftoneWordmarkFooter({
         const tRef = m.measureText("T")
         const oRef = m.measureText("O")
         const capRatio = Math.max(0.55, (oRef.actualBoundingBoxAscent || 71) / baseSize)
-        const aRatio = capRatio * (66 / 72)
-        const spaceA = 0.11
-        const spaceTO = 0.115
+        const aRatio = 0.66 // largura do SVG da marca: 66/100 em
+        const spaceA = 0.10 // margin-right do SVG original
+        const spaceTO = 0.14 // tracking da marca original
         const totalRatio = aRatio + spaceA + tRef.width / baseSize + spaceTO + oRef.width / baseSize
         const byWidth = (w * 0.76) / totalRatio
         const byHeight = (h - protectedTop) / Math.max(0.2, capRatio * (1 - c))
@@ -268,11 +268,11 @@ export default function HalftoneWordmarkFooter({
         m.lineJoin = "miter"
         m.lineCap = "butt"
         m.strokeStyle = "#000"
-        m.lineWidth = Math.max(1, cap * 0.083)
+        m.lineWidth = Math.max(1, size * (o.fontWeight === 300 ? 0.06 : 0.09))
         m.beginPath()
-        m.moveTo(x + m.lineWidth * 0.3, baseline + cap * 0.06)
-        m.lineTo(x + aWidth / 2, baseline - cap)
-        m.lineTo(x + aWidth - m.lineWidth * 0.3, baseline + cap * 0.06)
+        m.moveTo(x + size * 0.02, baseline + size * 0.12)
+        m.lineTo(x + size * 0.33, baseline - size * 0.63)
+        m.lineTo(x + size * 0.64, baseline + size * 0.12)
         m.stroke()
         x += aWidth + spaceA * size
         m.font = o.fontWeight + " " + size + "px " + o.fontFamily
