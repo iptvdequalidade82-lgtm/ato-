@@ -1,6 +1,6 @@
 import { Header } from "@/components/Header";
 import { Motion } from "@/components/Motion";
-import { About, Cta, Footer, Hero, Team } from "@/components/Sections";
+import { About, Cta, Footer, Hero, Impact, Team } from "@/components/Sections";
 import { Solutions } from "@/components/Solutions";
 
 export default function Page() {
@@ -17,6 +17,7 @@ export default function Page() {
         <Hero />
         <About />
         <Solutions />
+        <Impact />
         <Team />
         <Cta />
       </main>
